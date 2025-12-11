@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -22,7 +23,6 @@ fun HomeScreen(
     val user = FirebaseAuth.getInstance().currentUser
     val email = user?.email ?: "Unknown user"
 
-    // Background gradient
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -33,10 +33,7 @@ fun HomeScreen(
             ),
         contentAlignment = Alignment.Center
     ) {
-        AnimatedVisibility(
-            visible = true,
-            enter = fadeIn() + slideInVertically()
-        ) {
+        AnimatedVisibility(visible = true, enter = fadeIn() + slideInVertically()) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
@@ -52,17 +49,17 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Welcome!",
+                        text = "Bienvenue !",
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color(0xFF2575FC)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "You are logged in as:\n$email",
+                        text = "Vous êtes connecté en tant que:\n$email",
                         style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
                         color = Color.Black,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
@@ -72,7 +69,7 @@ fun HomeScreen(
                             .fillMaxWidth(0.6f)
                             .height(50.dp)
                     ) {
-                        Text("Sign Out", style = MaterialTheme.typography.bodyLarge)
+                        Text("Se déconnecter", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
