@@ -26,10 +26,18 @@ fun SignInScreen(
     onSignedIn: () -> Unit,
     onGoToSignUp: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
+    // Load saved email on first composition
+    var email by remember { mutableStateOf(viewModel.getSavedEmail() ?: "") }
     var password by remember { mutableStateOf("") }
 
     val authState by viewModel.authState.collectAsState()
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onSignedIn()
+            // NO signOut() here — preserve the logged‑in user
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -40,7 +48,7 @@ fun SignInScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .shadow(8.dp, RoundedCornerShape(24.dp)),
+                .shadow(8.dp, shape = RoundedCornerShape(24.dp)),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f))
         ) {
@@ -50,42 +58,43 @@ fun SignInScreen(
             ) {
                 Text("Connexion", style = MaterialTheme.typography.headlineMedium, color = Color(0xFF2575FC))
                 Spacer(modifier = Modifier.height(16.dp))
+
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
+                    singleLine = true
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password") },
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
+                    singleLine = true
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
-                when(authState) {
+
+                when (authState) {
                     is AuthState.Loading -> CircularProgressIndicator()
                     is AuthState.Error -> Text((authState as AuthState.Error).message, color = MaterialTheme.colorScheme.error)
-                    is AuthState.Success -> onSignedIn()
                     else -> {}
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { viewModel.signIn(email, password) },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    shape = RoundedCornerShape(24.dp)
-                ) { Text("Se connecter") }
+
+                Button(onClick = { viewModel.signIn(email, password) }) {
+                    Text("Se connecter")
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
-                TextButton(onClick = onGoToSignUp) { Text("Créer un compte", color = Color(0xFF2575FC)) }
+                TextButton(onClick = onGoToSignUp) {
+                    Text("Créer un compte")
+                }
             }
         }
     }

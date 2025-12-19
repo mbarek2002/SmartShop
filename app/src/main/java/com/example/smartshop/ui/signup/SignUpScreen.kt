@@ -30,6 +30,13 @@ fun SignUpScreen(
 
     val authState by viewModel.authState.collectAsState()
 
+    // Navigate only once when sign‑up is successful
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onSignedUp()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,8 +54,13 @@ fun SignUpScreen(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Créer un compte", style = MaterialTheme.typography.headlineMedium, color = Color(0xFF2575FC))
+                Text(
+                    "Créer un compte",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color(0xFF2575FC)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
+
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -58,7 +70,9 @@ fun SignUpScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -70,19 +84,27 @@ fun SignUpScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
-                when(authState) {
+
+                when (authState) {
                     is AuthState.Loading -> CircularProgressIndicator()
-                    is AuthState.Error -> Text((authState as AuthState.Error).message, color = MaterialTheme.colorScheme.error)
-                    is AuthState.Success -> onSignedUp()
+                    is AuthState.Error -> Text(
+                        (authState as AuthState.Error).message,
+                        color = MaterialTheme.colorScheme.error
+                    )
                     else -> {}
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
                 Button(
                     onClick = { viewModel.signUp(email, password) },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(24.dp)
-                ) { Text("Sign Up") }
+                ) {
+                    Text("Sign Up")
+                }
             }
         }
     }
